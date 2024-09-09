@@ -19,7 +19,6 @@ from .schemeparser import _parse_scheme
 # Change this
 #color_schemes_dir = "colorschemes\\"
 color_schemes_dir = Path(__file__).parent / "colorschemes"
-print(color_schemes_dir)
 
 LexerType = Union[Type[pygments.lexer.Lexer], pygments.lexer.Lexer]
 
@@ -350,3 +349,4 @@ class CodeView(Text):
     def scroll_line_update(self, event: Event | None = None) -> CodeView:
         self.horizontal_scroll(*self.xview())
         self.vertical_scroll(*self.yview())
+

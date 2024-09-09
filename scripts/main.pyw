@@ -17,14 +17,16 @@ import math
 import threading
 import numpy as np
 from PIL import Image, ImageTk
+from pathlib import Path
 
 #test working
 class WEdit:
     def __init__(self):
+        self.fdir = color_schemes_dir = Path(__file__).parent.parent
         pygame.init()
         pygame.mixer.init()
         self.root = tk.Tk()
-        self.root.title("WEdit 2.0")
+        self.root.title("WEdit")
         self.root.protocol("WM_DELETE_WINDOW", self.on_exit)
 
         self.keywordList = []
@@ -77,12 +79,11 @@ class WEdit:
         #self.root.bind("<Down>", lambda event: self.nav_items(0))
         self.volumeValue = tk.DoubleVar(self.root)
         self.volumeValue.set(0.5)
-        self.clickSound = pygame.mixer.Sound("audio\click.ogg")
+        self.clickSound = pygame.mixer.Sound(f"{self.fdir}\\audio\\click.ogg")
 
         self.cubeVisualValue = tk.IntVar(self.root)
         self.cubeVisualValue.set(0)
-        self.CubeVelSlower()
-
+        #self.CubeVelSlower()
         self.ChangeColorScheme(0)
         self.root.mainloop()
 
@@ -220,6 +221,10 @@ class WEdit:
         _result = mb.askquestion("", "Save File?")
         if (_result == 'yes'):
             self.SaveFile()
+
+    def GetFileName(self, path):
+        filename = os.path.basename(path)
+        self.root.title(f"{filename}")
 
 
     #! KEYS MANAGER
@@ -409,18 +414,20 @@ class WEdit:
         self.typefaceValue.set(settings._selected_typeface)
         typefaceDropdown = tk.OptionMenu(settingsTab, self.typefaceValue, *settings.typefaceOptions, command=lambda event:self.ChangeTypeface(self.typefaceValue.get()))
         typefaceDropdown.pack(side=tk.TOP)
+        
 
         #! AUDIO
-
-        self.mainVolumeLabel = tk.Label(audioTab)
+        self.mainVolumeLabel = tk.Label(audioTab, text="SOUND VOLUME")
+        self.mainVolumeLabel.pack(side=tk.TOP)
         self.mainVolumeSlider = tk.Scale(audioTab, from_=0.0, to=1.0, variable=self.volumeValue, resolution=0.1, orient=tk.HORIZONTAL, command=lambda event: self.ChangeMixerVolume("none"))
         self.mainVolumeSlider.pack(side=tk.TOP)
+        
 
         #! VISUAL
         self.cubeThreadBtn = tk.Checkbutton(visualTab, variable=self.cubeVisualValue, text="Cube Viewer", onvalue=1, offvalue=0, command=lambda: self.CubeVisualManager("none"))
         self.cubeThreadBtn.pack(side=tk.TOP)
 
-        self.SettingsWindowStyle()    
+        self.SettingsWindowStyle()
 
 
     def SettingsWindowStyle(self):
