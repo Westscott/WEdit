@@ -144,6 +144,8 @@ class WEdit:
             self.runCommand("py")
         elif _input.lower() == "c":
             self.SettingsWindow()
+        elif _input.lower() == "mp":
+            self.MusicPlayerWindow()
         elif _input.lower() == "exit":
             exit()
         else:
@@ -391,6 +393,7 @@ class WEdit:
     def SettingsWindow(self):
         _bgc = settings.backgroundOptions[settings._colorscheme_index]
         _fgc = settings.fontColorOptions[settings._colorscheme_index]
+        #? Highlight color
         self.settingWindowFrame = tk.Toplevel(self.root)
         self.settingWindowFrame.geometry("300x200")
         self.settingWindowFrame.configure(bg=_bgc)
@@ -417,15 +420,26 @@ class WEdit:
         
 
         #! AUDIO
-        self.mainVolumeLabel = tk.Label(audioTab, text="SOUND VOLUME")
+        self.musicVolumeLabel = tk.Label(audioTab, text="MUSIC VOLUME", font=(settings._selected_typeface, 9), bg=_bgc, fg=_fgc)
+        self.musicVolumeLabel.pack(side=tk.TOP)
+
+        self.musicVolumeSlider = tk.Scale(audioTab, from_=0.0, to=1.0, resolution=0.1, orient=tk.HORIZONTAL)
+        self.musicVolumeSlider.pack(side=tk.TOP)
+        self.musicVolumeSlider.configure(bg=_bgc, fg=_fgc)
+
+
+        self.mainVolumeLabel = tk.Label(audioTab, text="SOUND VOLUME", font=(settings._selected_typeface, 9), bg=_bgc, fg=_fgc)
         self.mainVolumeLabel.pack(side=tk.TOP)
         self.mainVolumeSlider = tk.Scale(audioTab, from_=0.0, to=1.0, variable=self.volumeValue, resolution=0.1, orient=tk.HORIZONTAL, command=lambda event: self.ChangeMixerVolume("none"))
         self.mainVolumeSlider.pack(side=tk.TOP)
+        self.mainVolumeSlider.configure(bg=_bgc, fg=_fgc)
         
 
         #! VISUAL
         self.cubeThreadBtn = tk.Checkbutton(visualTab, variable=self.cubeVisualValue, text="Cube Viewer", onvalue=1, offvalue=0, command=lambda: self.CubeVisualManager("none"))
         self.cubeThreadBtn.pack(side=tk.TOP)
+        # FG changes the check mark color as well
+        self.cubeThreadBtn.configure(bg=_bgc)
 
         self.SettingsWindowStyle()
 
@@ -444,5 +458,23 @@ class WEdit:
         )
 
 
+    #! MUSIC PLAYER
+    def MusicPlayerWindow(self):
+        _bgc = settings.backgroundOptions[settings._colorscheme_index]
+        _fgc = settings.fontColorOptions[settings._colorscheme_index]
+
+        self.musicPlayerFrame = tk.Toplevel(self.root)
+        self.musicPlayerFrame.title("MUSIC PLAYER")
+        self.musicPlayerFrame.configure(bg=_bgc)
+
+
+        self.playButton = tk.Button(self.musicPlayerFrame, text="PLAY", font=(settings._selected_typeface, 9))
+        self.playButton.pack(side=tk.TOP)
+        self.playButton.configure(bg=_bgc, fg=_fgc)
+        
+
+
 if __name__ == "__main__":
     WEdit()
+
+
