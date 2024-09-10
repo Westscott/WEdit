@@ -467,11 +467,31 @@ class WEdit:
         self.musicPlayerFrame.title("MUSIC PLAYER")
         self.musicPlayerFrame.configure(bg=_bgc)
 
+        infoFrame = tk.Frame(self.musicPlayerFrame, bg=_bgc)
+        infoFrame.pack(fill=tk.BOTH, side=tk.TOP)
 
-        self.playButton = tk.Button(self.musicPlayerFrame, text="PLAY", font=(settings._selected_typeface, 9))
-        self.playButton.pack(side=tk.TOP)
-        self.playButton.configure(bg=_bgc, fg=_fgc)
+        controlFrame = tk.Frame(self.musicPlayerFrame, bg=_bgc)
+        controlFrame.pack(fill=tk.BOTH, side=tk.BOTTOM)
         
+        self.songTitleLabel = tk.Label(infoFrame, text="SONG TITLE", font=(settings._selected_typeface, 9))
+        self.songTitleLabel.pack(side=tk.TOP)
+        self.songTitleLabel.configure(bg=_bgc, fg=_fgc)
+
+        self.playButton = tk.Button(controlFrame, text="PLAY", font=(settings._selected_typeface, 9), command=self.PlaySong)
+        self.playButton.pack(side=tk.LEFT)
+        self.playButton.configure(bg=_bgc, fg=_fgc)
+
+        self.stopButton = tk.Button(controlFrame, text="STOP", font=(settings._selected_typeface, 9), command=self.StopSong)
+        self.stopButton.pack(side=tk.LEFT)
+        self.stopButton.configure(bg=_bgc, fg=_fgc)
+
+    def PlaySong(self):
+        musicFP = filedialog.askopenfilename()
+        pygame.mixer.music.load(musicFP)
+        pygame.mixer.music.play()
+
+    def StopSong(self):
+        pygame.mixer.music.stop()
 
 
 if __name__ == "__main__":
