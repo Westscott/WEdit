@@ -19,7 +19,7 @@ import numpy as np
 from PIL import Image, ImageTk
 from pathlib import Path
 
-#test working
+# D:\_CustomSoftware\WEdit\scripts
 class WEdit:
     def __init__(self):
         self.fdir = color_schemes_dir = Path(__file__).parent.parent
@@ -200,6 +200,7 @@ class WEdit:
                 self.codeViewFrame.delete("1.0", tk.END)
                 self.codeViewFrame.insert("1.0", _contents)
             self.infoText.configure(text=f":FILE OPENED >> {self.activeFilePath}")
+            self.GetFileName(self.activeFilePath)
         except Exception as e:
             self.infoText.configure(text=":CANNOT OPEN FILE")
 
@@ -224,9 +225,10 @@ class WEdit:
         if (_result == 'yes'):
             self.SaveFile()
 
+    #! Show icon if the file is unsaved?
     def GetFileName(self, path):
         filename = os.path.basename(path)
-        self.root.title(f"{filename}")
+        self.root.title(f"WEdit | {filename}")
 
 
     #! KEYS MANAGER
@@ -388,6 +390,9 @@ class WEdit:
     def ChangeMixerVolume(self, event=None):
         self.clickSound.set_volume(self.volumeValue.get())
 
+    def ChangeMusicVolume(self, event=None):
+        print("Method to change mixer volume for music not sounds")
+
 
     #! SETTINGS MANAGER
     def SettingsWindow(self):
@@ -409,8 +414,11 @@ class WEdit:
 
         visualTab = tk.Frame(configNotebook, bg=_bgc)
         configNotebook.add(visualTab, text="VISUAL")
+
+        commandsTab = tk.Frame(configNotebook, bg=_bgc)
+        configNotebook.add(commandsTab, text="COMMANDS")
         
-        #spacer1 = tk.Label(settingsTab, tex="").pack(pady=2)
+        #! EDITOR
         typefaceLabel = tk.Label(settingsTab, text="TYPEFACE", font=(settings._selected_typeface, 9), bg=_bgc, fg=_fgc)
         typefaceLabel.pack(side=tk.TOP)
         self.typefaceValue = tk.StringVar(self.root)
@@ -422,11 +430,9 @@ class WEdit:
         #! AUDIO
         self.musicVolumeLabel = tk.Label(audioTab, text="MUSIC VOLUME", font=(settings._selected_typeface, 9), bg=_bgc, fg=_fgc)
         self.musicVolumeLabel.pack(side=tk.TOP)
-
         self.musicVolumeSlider = tk.Scale(audioTab, from_=0.0, to=1.0, resolution=0.1, orient=tk.HORIZONTAL)
         self.musicVolumeSlider.pack(side=tk.TOP)
         self.musicVolumeSlider.configure(bg=_bgc, fg=_fgc)
-
 
         self.mainVolumeLabel = tk.Label(audioTab, text="SOUND VOLUME", font=(settings._selected_typeface, 9), bg=_bgc, fg=_fgc)
         self.mainVolumeLabel.pack(side=tk.TOP)
@@ -462,6 +468,8 @@ class WEdit:
     def MusicPlayerWindow(self):
         _bgc = settings.backgroundOptions[settings._colorscheme_index]
         _fgc = settings.fontColorOptions[settings._colorscheme_index]
+        self.musicList = []
+        self.songIndex = 0
 
         self.musicPlayerFrame = tk.Toplevel(self.root)
         self.musicPlayerFrame.title("MUSIC PLAYER")
@@ -481,13 +489,45 @@ class WEdit:
         self.playButton.pack(side=tk.LEFT)
         self.playButton.configure(bg=_bgc, fg=_fgc)
 
+        self.pauseButton = tk.Button(controlFrame, text="PAUSE", font=(settings._selected_typeface, 9), command=self.PauseSong)
+
         self.stopButton = tk.Button(controlFrame, text="STOP", font=(settings._selected_typeface, 9), command=self.StopSong)
         self.stopButton.pack(side=tk.LEFT)
         self.stopButton.configure(bg=_bgc, fg=_fgc)
 
+        self.skipButton = tk.Button(controlFrame, text="NEXT", font=(settings._selected_typeface, 9), command=self.SkipSong)
+        self.skipButton.pack(side=tk.LEFT)
+        self.skipButton.configure(bg=_bgc, fg=_fgc)
+
+    def GetPlaylist(self):
+        _mfp =  f"{self.fdir}\\music"
+        for fname in os.listdir(_mfp):
+            if fname.endswith(".mp3") or fname.endswith(".wav"):
+                self.musicList.append(f"{_mfp}\\{fname}")
+    
     def PlaySong(self):
-        musicFP = filedialog.askopenfilename()
-        pygame.mixer.music.load(musicFP)
+        if len(self.musicList) == 0:
+            self.GetPlaylist()                
+        pygame.mixer.music.load(self.musicList[self.songIndex])
+        self.songTitleLabel.configure(text=f"{os.path.basename(self.musicList[self.songIndex])}")
+        pygame.mixer.music.play()
+        
+
+    def CheckSong(self):
+        if not pygame.mixer.music.get_busy():
+            self.songIndex += 1
+            if self.songIndex > len(self.musicList)-1:
+                self.songIndex = 0
+            self.PlaySong()
+
+    def SkipSong(self):
+        pygame.mixer.music.stop()
+        self.CheckSong()
+
+    def PauseSong(self):
+        pygame.mixer.music.pause()
+
+    def ResumeSong(self):
         pygame.mixer.music.play()
 
     def StopSong(self):
@@ -496,5 +536,4 @@ class WEdit:
 
 if __name__ == "__main__":
     WEdit()
-
 
